@@ -15,6 +15,14 @@ const PROJECTS = [
     tags: ['Python', 'Pandas', 'Data Analysis', 'Visualization'],
     href: 'https://github.com/azrialahmad/virtual-photography-analysis',
   },
+  {
+    index: '03',
+    name: 'mouse-movements',
+    description:
+      'An interactive, side-by-side visualizer website for three mouse movement algorithms. from a simple linear baseline to a full biomechanical model.',
+    tags: ['Vite', 'Javascript', 'Pico CSS'],
+    href: 'https://azrialahmad.is-a.dev/mousemovements/',
+  }
 ]
 
 export default function Projects() {

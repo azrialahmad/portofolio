@@ -4,6 +4,8 @@
 //
 // Supported formats: jpg, jpeg, png, webp, avif
 
+import Lightbox, { useLightbox } from './Lightbox'
+
 const streetImages = Object.values(
   import.meta.glob('./assets/photography/street/*.{jpg,jpeg,png,webp,avif}', { eager: true, query: '?url', import: 'default' })
 )
@@ -16,19 +18,21 @@ const cosplayImages = Object.values(
 const STREET_SLOTS = [{ span: true }, {}, {}, {}, {}, {}]  // 1 large + 5 regular
 const COSPLAY_SLOTS = [{ span: true }, {}, {}, {}, {}, {}]
 
-function PhotoCell({ url, alt, span }) {
+function PhotoCell({ url, alt, span, onOpen }) {
   return (
     <div
-      className={`photo-placeholder${span ? ' gallery-span-2' : ''}`}
+      className={`photo-placeholder${span ? ' gallery-span-2' : ''}${url ? ' photo-clickable' : ''}`}
       role="img"
       aria-label={url ? alt : 'Photo placeholder'}
+      onClick={url ? () => onOpen(url) : undefined}
+      style={url ? { cursor: 'pointer' } : undefined}
     >
       {url && <img src={url} alt={alt} loading="lazy" />}
     </div>
   )
 }
 
-function GalleryGrid({ slots, images, altPrefix }) {
+function GalleryGrid({ slots, images, altPrefix, onOpen }) {
   // Fill slots with real images where available, show placeholder for the rest
   const mainSlots = slots.slice(0, 3)   // large-grid (2-col)
   const extraSlots = slots.slice(3)      // secondary row
@@ -37,12 +41,12 @@ function GalleryGrid({ slots, images, altPrefix }) {
     <>
       <div className="gallery-grid-main">
         {mainSlots.map((slot, i) => (
-          <PhotoCell key={i} url={images[i]} alt={`${altPrefix} ${i + 1}`} span={slot.span} />
+          <PhotoCell key={i} url={images[i]} alt={`${altPrefix} ${i + 1}`} span={slot.span} onOpen={onOpen} />
         ))}
       </div>
       <div className="gallery-grid-secondary">
         {extraSlots.map((slot, i) => (
-          <PhotoCell key={i} url={images[i + mainSlots.length]} alt={`${altPrefix} ${i + mainSlots.length + 1}`} />
+          <PhotoCell key={i} url={images[i + mainSlots.length]} alt={`${altPrefix} ${i + mainSlots.length + 1}`} onOpen={onOpen} />
         ))}
       </div>
     </>
@@ -50,6 +54,8 @@ function GalleryGrid({ slots, images, altPrefix }) {
 }
 
 export default function Photography() {
+  const lightbox = useLightbox()
+
   return (
     <section className="section" id="photography">
       <div className="container">
@@ -67,14 +73,16 @@ export default function Photography() {
 
         <p className="gallery-label reveal">Street &amp; Candid</p>
         <div className="reveal">
-          <GalleryGrid slots={STREET_SLOTS} images={streetImages} altPrefix="Street photo" />
+          <GalleryGrid slots={STREET_SLOTS} images={streetImages} altPrefix="Street photo" onOpen={lightbox.open} />
         </div>
 
         <p className="gallery-label reveal">Cosplay Portraits</p>
         <div className="reveal">
-          <GalleryGrid slots={COSPLAY_SLOTS} images={cosplayImages} altPrefix="Cosplay portrait" />
+          <GalleryGrid slots={COSPLAY_SLOTS} images={cosplayImages} altPrefix="Cosplay portrait" onOpen={lightbox.open} />
         </div>
       </div>
+
+      <Lightbox src={lightbox.src} onClose={lightbox.close} />
     </section>
   )
 }

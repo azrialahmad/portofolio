@@ -3,6 +3,8 @@
 //
 // Supported formats: jpg, jpeg, png, webp, avif
 
+import Lightbox, { useLightbox } from './Lightbox'
+
 const designImages = Object.values(
   import.meta.glob('./assets/design/*.{jpg,jpeg,png,webp,avif}', { eager: true, query: '?url', import: 'default' })
 )
@@ -11,6 +13,8 @@ const designImages = Object.values(
 const MOSAIC_SLOTS = [{ wide: true }, {}, {}, { wide: true }, {}]
 
 export default function Design() {
+  const lightbox = useLightbox()
+
   return (
     <section className="section design-section-bg" id="design">
       <div className="container">
@@ -30,9 +34,11 @@ export default function Design() {
           {MOSAIC_SLOTS.map((slot, i) => (
             <div
               key={i}
-              className="photo-placeholder"
+              className={`photo-placeholder${designImages[i] ? ' photo-clickable' : ''}`}
               role="img"
               aria-label={designImages[i] ? `Design work ${i + 1}` : 'Design placeholder'}
+              onClick={designImages[i] ? () => lightbox.open(designImages[i]) : undefined}
+              style={designImages[i] ? { cursor: 'pointer' } : undefined}
             >
               {designImages[i] && (
                 <img src={designImages[i]} alt={`Design work ${i + 1}`} loading="lazy" />
@@ -41,7 +47,8 @@ export default function Design() {
           ))}
         </div>
       </div>
+
+      <Lightbox src={lightbox.src} onClose={lightbox.close} />
     </section>
   )
 }
-
